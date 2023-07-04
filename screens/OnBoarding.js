@@ -42,19 +42,19 @@ const OnBoarding = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <SafeAreaView style={styles.mainContainer}>
+        <View style={styles.mainContainer}>
           <View style={styles.headerContainer}>
             <Image
               source={require("../assets/Logo.png")}
               style={styles.image}
             />
           </View>
-          <KeyboardAvoidingView
-            style={styles.formContainer}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}>
-            <Text style={[styles.text, { marginTop: 60, marginBottom: 170 }]}>
+          <View style={styles.formContainer}>
+            <Text style={[styles.text, { marginTop: 60, marginBottom: 80 }]}>
               Let us get to know you
             </Text>
             <Text style={styles.text}>First Name</Text>
@@ -63,32 +63,34 @@ const OnBoarding = () => {
               value={firstName}
               onChangeText={onChangeFirstName}
             />
-            <Text style={styles.text}>Email Name</Text>
+            <Text style={styles.text}>Email</Text>
             <TextInput
               style={styles.textInput}
               value={email}
               onChangeText={onChangeEmail}
             />
-          </KeyboardAvoidingView>
-
+          </View>
           <View
             style={[
               styles.headerContainer,
-              { alignItems: "flex-end", paddingRight: 20 },
+              { alignItems: "flex-end", paddingRight: 20, marginTop: 110 },
             ]}>
             <TouchableOpacity style={styles.button} onPress={handleNextPress}>
               <Text style={styles.text}>Next</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+  },
+  mainContainer: {
     width: "100%",
     backgroundColor: "#b8b8b8",
   },
@@ -111,7 +113,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   formContainer: {
-    flex: 1,
     alignItems: "center",
     paddingBottom: 16,
   },
