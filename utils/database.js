@@ -25,7 +25,13 @@ const insertDataAndGetResult = (data) => {
     db.transaction((tx) => {
       tx.executeSql(
         "INSERT INTO menu (itemName, price, description, image, category) VALUES (?, ?, ?, ?, ?)",
-        [data.name, data.price, data.description, data.image, data.category],
+        [
+          data.itemName,
+          data.price,
+          data.description,
+          data.image,
+          data.category,
+        ],
         (_, { insertId }) => {
           tx.executeSql(
             "SELECT * FROM menu WHERE id = ?",
@@ -56,6 +62,7 @@ const checkAndRetrieveData = () => {
         [],
         (_, { rows }) => {
           const data = rows._array;
+          console.log("inside db", rows._array);
           if (data.length > 0) {
             resolve(data);
           } else {

@@ -4,14 +4,17 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Toolbar = ({ showBackIcon, onProfileImagePress, onPressBack }) => {
-  const [image, setImage] = useState("file:///../../assets/Profile.png");
+  const [image, setImage] = useState();
   useEffect(() => {
     const getImage = async () => {
       try {
         const userData = await AsyncStorage.getItem("user_data");
         const parsedUserData = JSON.parse(userData);
+        console.log("dddddddd", parsedUserData.image);
         if (parsedUserData.image) {
           setImage(parsedUserData.image);
+        } else {
+          setImage(require("../../assets/Profile.png"));
         }
       } catch (error) {
         console.log("error ", error);
@@ -39,7 +42,7 @@ const Toolbar = ({ showBackIcon, onProfileImagePress, onPressBack }) => {
         style={styles.logoImage}
       />
       <TouchableOpacity onPress={onProfileImagePress}>
-        <Image source={{ uri: image }} style={styles.profileImage} />
+        <Image source={image} style={styles.profileImage} />
       </TouchableOpacity>
     </View>
   );

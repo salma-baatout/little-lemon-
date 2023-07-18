@@ -24,6 +24,7 @@ const Home = ({ navigation, route }) => {
   const [filteredMenu, setFilteredMenu] = React.useState(menu);
 
   React.useEffect(() => {
+    console.log("this is data from onBoard", route.params.menu);
     const categoryArray = Array.from(
       new Set(route.params.menu.map((item) => item.category))
     ).map((category) => ({ name: category, isSelected: false }));
@@ -63,11 +64,13 @@ const Home = ({ navigation, route }) => {
         // Show an error message or perform appropriate error handling
       });
   };
+
   const handleSearch = (search) => {
     if (search.length > 0) {
       const filteredItems = menu.filter((item) => {
-        item.itemName.toLowerCase().includes(search.toLowerCase());
+        return item.itemName.toLowerCase().includes(search.toLowerCase());
       });
+      console.log("filteredItems", filteredItems);
       setFilteredMenu(filteredItems);
     } else {
       setFilteredMenu(menu);

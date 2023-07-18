@@ -2,7 +2,6 @@ import * as React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 
 const MenuItem = ({ data }) => {
-  console.log("menu item", data);
   return (
     <View style={styles.container}>
       <Text style={styles.itemTitle}>{data.itemName}</Text>

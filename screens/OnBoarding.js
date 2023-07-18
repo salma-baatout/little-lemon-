@@ -13,7 +13,11 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createDatabase, insertDataAndGetResult } from "../utils/database";
+import {
+  createDatabase,
+  insertDataAndGetResult,
+  checkAndRetrieveData,
+} from "../utils/database";
 
 const OnBoarding = ({ navigation }) => {
   const [firstName, setFirstName] = useState("");
@@ -29,8 +33,12 @@ const OnBoarding = ({ navigation }) => {
         )
           .then((response) => response.json())
           .then((data) => {
-            // console.log("data", data);
+            console.log("data", data);
             setMenu(data.menu);
+            setTimeout(() => {
+              storeDataSQL(data.menu);
+            }, 2000);
+
             categoryArray = Array.from(
               new Set(data.menu.map((item) => item.category))
             );
@@ -43,8 +51,8 @@ const OnBoarding = ({ navigation }) => {
   }, []);
 
   const onChangeFirstName = (name) => {
-    if (/^[a-zA-Z]+$/.test(name)) {
-      setFirstName(name);
+    if (name.trim() === "" || /^[a-zA-Z\s]*$/.test(name)) {
+      setFirstName(name.trim());
     }
   };
 
@@ -63,13 +71,13 @@ const OnBoarding = ({ navigation }) => {
       Alert.alert("Error", "Please enter a valid email address.");
     } else {
       // Proceed to the next step
+
       storeData();
     }
   };
 
   const storeData = async () => {
     try {
-      storeDataSQL();
       await AsyncStorage.setItem(
         "user_data",
         JSON.stringify({
@@ -77,35 +85,54 @@ const OnBoarding = ({ navigation }) => {
           email: email,
         })
       );
+      checkData();
     } catch (error) {
       console.log("error", error);
     }
   };
-  const storeDataSQL = () => {
-    menu.forEach((menuItem) => {
-      insertDataAndGetResult(menuItem)
-        .then((insertedData) => {
-          console.log("Inserted data:", insertedData);
+
+  const storeDataSQL = async (menuItems) => {
+    try {
+      console.log(menuItems);
+      const insertPromises = menuItems.map(async (menuItem) => {
+        const dataToInsert = {
+          itemName: menuItem.name, // Map 'name' to 'itemName'
+          price: menuItem.price,
+          description: menuItem.description,
+          image: menuItem.image,
+          category: menuItem.category,
+        };
+
+        const insertedData = await insertDataAndGetResult(dataToInsert);
+        console.log("Inserted data:", insertedData);
+        return insertedData;
+      });
+
+      const insertedDataArray = await Promise.all(insertPromises);
+      console.log("All data inserted:", insertedDataArray);
+
+      // Code to execute after all data has been stored
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
+  const checkData = () => {
+    checkAndRetrieveData()
+      .then((data) => {
+        if (data) {
+          // Data exists, do something with it
+          console.log("data is", data);
           navigation.navigate("Home", { menu: data });
-        })
-        .catch((error) => {
-          console.log("Error:", error);
-        });
-      // .then((data) => {
-      //   if (data) {
-      //     // Data exists, do something with it
-      //     isLoggedIn && navigation.navigate("Home", (menu = { data }));
-      //     console.log(data);
-      //   } else {
-      //     // Data does not exist
-      //     console.log("No data found");
-      //   }
-      // })
-      // .catch((error) => {
-      //   // Error occurred while retrieving data
-      //   console.log("Error:", error);
-      // });
-    });
+        } else {
+          // Data does not exist
+          console.log("No data found");
+        }
+      })
+      .catch((error) => {
+        // Error occurred while retrieving data
+        console.log("Error:", error);
+      });
   };
   return (
     <KeyboardAvoidingView
